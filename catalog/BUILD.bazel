@@ -1,0 +1,38 @@
+# catalog — hosts a genuine MISPLACED target and one root-only library.
+#
+# `catalog` (the top target) is consumed only by app:server (root) => no verdict.
+# It is one of the three external consumers of the orders:service hub.
+#
+# `pricing_helper` is consumed by exactly one external area — gateway
+# (gateway:middleware depends on it) — and nothing in catalog uses it. ext==1 and
+# not used at home => MISPLACED (penalty 3). The recommended move relocates it
+# into gateway (its sole consumer), deleting the gateway->catalog edge. This is
+# the "move this target" operation an architect wants: the helper is filed under
+# catalog but belongs to gateway.
+#
+# `discount_test` demonstrates the wrong_file_name advisory. Its source
+# discount_test.cc carries the `_test` suffix but the target lives in catalog/,
+# not under a test/ folder segment — which //:config's filename_rules forbids. So
+# the aspect flags discount_test with the wrong_file_name hint (suggestion:
+# "discount_test.cc belongs in a test/ folder"). See catalog/discount_test.cc.
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "catalog",
+    deps = [
+        "//common:types",
+        "//orders:service",
+        "//util:strings",
+    ],
+)
+
+cc_library(
+    name = "pricing_helper",
+)
+
+cc_test(
+    name = "discount_test",
+    srcs = ["discount_test.cc"],
+)

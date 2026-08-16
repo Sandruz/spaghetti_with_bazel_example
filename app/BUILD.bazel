@@ -1,0 +1,21 @@
+# app — the composition root. `server` is a cc_binary, so the aspect treats it
+# as a composition ROOT (§4.4): its outgoing deps are wiring, not architectural
+# fan-in. Libraries consumed ONLY by `server` (billing:invoicer, catalog:catalog,
+# platform:runtime, gateway:http) therefore get NO "misplaced" verdict — the root
+# depending on them is the whole point. This is the false-positive the root-
+# exclusion rule fixes.
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "server",
+    srcs = ["main.cc"],
+    deps = [
+        "//billing:invoicer",
+        "//catalog:catalog",
+        "//gateway:http",
+        "//orders:service",
+        "//platform:runtime",
+    ],
+)

@@ -1,0 +1,10 @@
+# util — the second SHARED leaf area. `strings` is used by two areas (orders,
+# catalog); shared home + fan-in >=2 => healthy_shared, penalty 0. A second shared
+# area exists so the graph shows shared usage isn't a fluke of one package.
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "strings",
+)

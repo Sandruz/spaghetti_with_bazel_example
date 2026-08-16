@@ -1,0 +1,14 @@
+# platform — hosts an encapsulation boundary (platform/internal/). `runtime` is
+# consumed only by app:server (root) => no verdict; it depends on its own internal
+# targets (intra-area, not a smell) so those internals have a legitimate home use.
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "runtime",
+    deps = [
+        "//platform/internal:metrics",
+        "//platform/internal:ring_buffer",
+    ],
+)

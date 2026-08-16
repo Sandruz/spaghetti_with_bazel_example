@@ -1,0 +1,29 @@
+# billing — closes the 2-area cycle with orders. `invoicer` depends on
+# orders:service and orders:service depends back on billing:rates, so areas
+# {orders, billing} form a multi-area SCC: both cross-area edges on that loop are
+# tagged `cycle` (penalty 20 each = 40, the dominant cost in the graph).
+#
+# `invoicer` is consumed ONLY by the app:server composition root, so it gets NO
+# verdict (root exclusion, §4.4) — without that rule the tool would wrongly
+# suggest moving it into app. It is also one of the three external consumers of
+# the orders:service hub.
+#
+# `rates` is consumed by exactly one external area (orders, via service) and IS
+# used at home (invoicer depends on it) => single_cross (watch, penalty 1). Its
+# incoming cross-area edge from orders is the orders->billing half of the cycle.
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "invoicer",
+    deps = [
+        "//billing:rates",
+        "//common:types",
+        "//orders:service",
+    ],
+)
+
+cc_library(
+    name = "rates",
+)

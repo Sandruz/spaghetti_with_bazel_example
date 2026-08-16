@@ -1,0 +1,25 @@
+# gateway — the edge/API area. `http` is consumed only by app:server (root) =>
+# no verdict; it is the third external consumer of the orders:service hub and it
+# wires in middleware at home.
+#
+# `middleware` depends on catalog:pricing_helper across the area boundary — it is
+# pricing_helper's SOLE external consumer, which is what makes pricing_helper
+# `misplaced` toward gateway (the recommended move destination).
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "http",
+    deps = [
+        "//gateway:middleware",
+        "//orders:service",
+    ],
+)
+
+cc_library(
+    name = "middleware",
+    deps = [
+        "//catalog:pricing_helper",
+    ],
+)

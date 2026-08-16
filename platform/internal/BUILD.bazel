@@ -1,0 +1,29 @@
+# platform/internal — an encapsulation boundary. Every target here is is_internal
+# (the `internal` path segment marks it, §4.2), so a cross-area edge INTO it is an
+# encapsulation_leak.
+#
+# `ring_buffer` is properly hidden: its visibility is a restricted allowlist
+# (platform + orders), not public. platform:runtime uses it at home (legitimate),
+# but orders:service reaches across the area boundary into it => encapsulation_leak
+# (penalty 5) plus single_cross (watch, penalty 1) for the lone external area.
+# This is the leak an architect should either cut or sanction.
+#
+# `metrics` is the OVER-EXPOSED case: it lives behind the internal/ boundary yet
+# declares //visibility:public. The segment rule still marks it is_internal, but
+# nothing outside platform consumes it — its public visibility is broader than its
+# actual use. The tool flags this ADVISORY (narrow //visibility:public down to the
+# packages that need it); it carries no score penalty, it's an architect hint.
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "ring_buffer",
+    visibility = [
+        "//orders:__subpackages__",
+        "//platform:__subpackages__",
+    ],
+)
+
+cc_library(
+    name = "metrics",
+    visibility = ["//visibility:public"],
+)

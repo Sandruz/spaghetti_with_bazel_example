@@ -1,0 +1,11 @@
+# common — a SHARED leaf area (declared in //:config shared_areas). `types` is
+# depended on by four different areas (orders, billing, catalog, gateway); because
+# common is shared, that wide fan-in is HEALTHY, not a hub. Verdict: healthy_shared,
+# penalty 0. This is the "good" shape the tool should NOT flag.
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "types",
+)

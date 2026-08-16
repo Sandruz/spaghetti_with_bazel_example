@@ -1,0 +1,24 @@
+# orders — home of the LEAKY HUB. `service` is consumed by three separate areas
+# (billing, catalog, gateway) but orders is NOT a shared area, so that wide fan-in
+# is a smell: verdict leaky_hub, penalty 6. The recommended fix is EXTRACT — pull
+# service's public surface into a shared area (common) and repoint the three
+# consumers there. That both neutralizes the hub AND dissolves the orders<->billing
+# cycle (billing:invoicer's dep repoints to the shared shim), projecting 56 -> 10.
+#
+# service also participates in a 2-area CYCLE with billing: service depends on
+# billing:rates while billing:invoicer depends back on service ({orders,billing}
+# SCC). And service reaches into an encapsulation boundary — platform/internal:
+# ring_buffer — an encapsulation_leak (penalty 5).
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "service",
+    deps = [
+        "//billing:rates",
+        "//common:types",
+        "//platform/internal:ring_buffer",
+        "//util:strings",
+    ],
+)

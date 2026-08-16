@@ -1,0 +1,16 @@
+# Cross-module cc toolchain resolution: the aspect analyzes cc_library targets
+# under @spaghetti_with_bazel's linux/windows platforms, which requires
+# platform-based toolchain resolution to pick the registered zig toolchains (§3c).
+common --incompatible_enable_cc_toolchain_resolution
+
+build --platforms=@spaghetti_with_bazel//platforms:linux
+build:spaghetti_with_bazel --aspects=@spaghetti_with_bazel//:aspect.bzl%spaghetti_aspect
+build:spaghetti_with_bazel --output_groups=spaghetti_report
+build:spaghetti_with_bazel --@spaghetti_with_bazel//:config=@spaghetti_config//:config
+
+# CI: run the visualizer headless. SPAGHETTI_GATE=1 makes the app print the merged
+# per-target verdicts to stdout and exit in case of heuristic violations.
+run:spaghetti_ci --run_env=SPAGHETTI_GATE=1
+
+# Local developer overrides (not checked in).
+try-import %workspace%/user.bazelrc

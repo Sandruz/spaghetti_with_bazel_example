@@ -1,0 +1,20 @@
+"""Consumer root package.
+
+The scoring rulebook now lives in MODULE.bazel: the `spaghetti` module extension
+generates @spaghetti_config//:config, and .bazelrc points the aspect's //:config
+flag at it (`--@spaghetti_with_bazel//:config=@spaghetti_config//:config`). There
+is no //:config target here anymore — edit spaghetti.config(...) in MODULE.bazel.
+
+The architecture report is produced by the `spaghetti_aspect`, injected from
+.bazelrc — there is no report target here. Build it with:
+
+  bazel build --config=spaghetti_with_bazel //...   # *.spaghetti_linux.json
+  bazel build --config=spaghetti_with_bazel \\
+      --platforms=@spaghetti_with_bazel//platforms:windows //...
+
+Each target emits its own <target>.spaghetti_<platform>.json under bazel-bin;
+read app/server.spaghetti_linux.json — its closure is the whole graph, so it
+shows every smell at once. Both platforms are scored by the same rulebook.
+"""
+
+package(default_visibility = ["//visibility:public"])
